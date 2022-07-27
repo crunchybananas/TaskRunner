@@ -36,6 +36,7 @@ public enum Executable: String {
   case brew = "/opt/homebrew/bin/brew"
   case archetecture = "/usr/bin/arch"
   case git = "/usr/bin/git"
+  case yarn = "/opt/homebrew/bin/yarn"
 }
 
 public enum TaskStatus {
