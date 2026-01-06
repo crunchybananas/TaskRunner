@@ -33,9 +33,10 @@ public class DebugLog: ObservableObject, Identifiable {
 }
 
 public enum Executable: String {
-  case brew = "file:///opt/homebrew/bin/brew"
-  case archetecture = "file:///usr/bin/arch"
-  case git = "file:///usr/bin/git"
+  case brew = "/opt/homebrew/bin/brew"
+  case archetecture = "/usr/bin/arch"
+  case git = "/usr/bin/git"
+  case yarn = "/opt/homebrew/bin/yarn"
 }
 
 public enum TaskStatus {
