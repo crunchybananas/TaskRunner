@@ -26,7 +26,7 @@ public actor ProcessExecutor {
     }
   }
   
-  public struct Result {
+  public struct Result: Sendable {
     public let stdout: Data
     public let stderr: Data
     public let exitCode: Int32
