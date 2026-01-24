@@ -85,12 +85,19 @@ public actor ProcessExecutor {
     async let stdoutData = stdoutPipe.fileHandleForReading.readToEnd()
     async let stderrData = stderrPipe.fileHandleForReading.readToEnd()
     
-    // Wait for completion
-    process.waitUntilExit()
+    // Wait for completion without blocking the actor
+    let exitCode: Int32 = await withCheckedContinuation { continuation in
+      if process.isRunning {
+        process.terminationHandler = { proc in
+          continuation.resume(returning: proc.terminationStatus)
+        }
+      } else {
+        continuation.resume(returning: process.terminationStatus)
+      }
+    }
     
     let stdout = try await stdoutData ?? Data()
     let stderr = try await stderrData ?? Data()
-    let exitCode = process.terminationStatus
     
     let result = Result(stdout: stdout, stderr: stderr, exitCode: exitCode)
     
@@ -157,12 +164,20 @@ public actor ProcessExecutor {
             continuation.yield(line)
           }
           
-          process.waitUntilExit()
+          let exitCode: Int32 = await withCheckedContinuation { continuation in
+      if process.isRunning {
+        process.terminationHandler = { proc in
+          continuation.resume(returning: proc.terminationStatus)
+        }
+      } else {
+        continuation.resume(returning: process.terminationStatus)
+      }
+    }
           
-          if process.terminationStatus != 0 {
+          if exitCode != 0 {
             continuation.finish(throwing: ExecutionError.executionFailed(
-              exitCode: process.terminationStatus,
-              stderr: "Process exited with code \(process.terminationStatus)"
+              exitCode: exitCode,
+              stderr: "Process exited with code \(exitCode)"
             ))
           } else {
             continuation.finish()
